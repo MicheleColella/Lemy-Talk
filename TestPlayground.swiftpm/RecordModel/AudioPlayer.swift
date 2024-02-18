@@ -13,9 +13,9 @@ class AudioPlayer: NSObject, ObservableObject, AVAudioPlayerDelegate {
             isPlaying = true
         } catch {
             print("Playback failed: \(error.localizedDescription)")
-            // Gestire l'errore in modo appropriato
         }
     }
+
 
     func stopPlayback() {
         audioPlayer?.stop()

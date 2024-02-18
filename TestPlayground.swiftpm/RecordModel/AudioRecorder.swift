@@ -1,18 +1,13 @@
 import Foundation
 import AVFoundation
-import Combine
 
 class AudioRecorder: ObservableObject {
-    @Published var recordings: [URL] = []
     var audioRecorder: AVAudioRecorder?
-    @Published var recording = false
+        @Published var recording = false
 
-    private var jsonFileURL: URL {
-        let docPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)[0]
-        return docPath.appendingPathComponent("recordings.json")
-    }
-
-    let settings: [String: Any] = [
+        // Aggiungi questa closure
+        var onRecordingCompleted: ((URL) -> Void)?
+        let settings: [String: Any] = [
         AVFormatIDKey: Int(kAudioFormatLinearPCM),
         AVSampleRateKey: 88200,
         AVNumberOfChannelsKey: 1,
@@ -21,7 +16,7 @@ class AudioRecorder: ObservableObject {
         AVLinearPCMIsFloatKey: false,
         AVEncoderAudioQualityKey: AVAudioQuality.high.rawValue
     ]
-
+    
     func startRecording() {
         let recordingSession = AVAudioSession.sharedInstance()
         do {
@@ -29,6 +24,7 @@ class AudioRecorder: ObservableObject {
             try recordingSession.setActive(true)
         } catch {
             print("Failed setting up recording session")
+            return
         }
 
         let dateFormatter = DateFormatter()
@@ -38,40 +34,20 @@ class AudioRecorder: ObservableObject {
         let audioFileName = docPath.appendingPathComponent("\(dateFormatter.string(from: Date()))_\(uniqueID).wav")
 
         do {
-            audioRecorder = try AVAudioRecorder(url: audioFileName, settings: settings)
-            audioRecorder?.record()
-            recording = true
-            recordings.append(audioFileName)
-            saveRecordingsToFile()
-        } catch {
-            print("Couldn't start recording")
-        }
+                    audioRecorder = try AVAudioRecorder(url: audioFileName, settings: settings)
+                    audioRecorder?.record()
+                    recording = true
+                } catch {
+                    print("Couldn't start recording: \(error.localizedDescription)")
+                }
     }
 
     func stopRecording() {
-        audioRecorder?.stop()
-        recording = false
-    }
-
-    private func saveRecordingsToFile() {
-        do {
-            let data = try JSONEncoder().encode(recordings)
-            try data.write(to: jsonFileURL)
-        } catch {
-            print("Failed to save recordings: \(error.localizedDescription)")
+            audioRecorder?.stop()
+            recording = false
+            if let url = audioRecorder?.url {
+                // Chiamare la closure dopo aver fermato la registrazione
+                onRecordingCompleted?(url)
+            }
         }
-    }
-
-    func loadRecordingsFromFile() {
-        do {
-            let data = try Data(contentsOf: jsonFileURL)
-            recordings = try JSONDecoder().decode([URL].self, from: data)
-        } catch {
-            print("Failed to load recordings: \(error.localizedDescription)")
-        }
-    }
-
-    init() {
-        loadRecordingsFromFile()
-    }
 }
