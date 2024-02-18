@@ -2,6 +2,7 @@ import Foundation
 import AVFoundation
 
 class AudioRecorder: ObservableObject {
+    @Published var recordings: [URL] = []
     var audioRecorder: AVAudioRecorder?
         @Published var recording = false
 
@@ -47,6 +48,7 @@ class AudioRecorder: ObservableObject {
             recording = false
             if let url = audioRecorder?.url {
                 // Chiamare la closure dopo aver fermato la registrazione
+                recordings.append(url)
                 onRecordingCompleted?(url)
             }
         }

@@ -7,4 +7,5 @@ public struct Conversation: Codable, Hashable {
     var notes: String
     var lastUpdated: Date
     var fileName: String?
+    var recordingURL: URL?
 }

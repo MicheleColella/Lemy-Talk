@@ -1,6 +1,7 @@
 import SwiftUI
 
 struct ConversationCard: View {
+    @ObservedObject var audioPlayer = AudioPlayer()
     
     var conversation: Conversation
     @Environment(\.colorScheme) var colorScheme: ColorScheme
@@ -55,7 +56,14 @@ struct ConversationCard: View {
             .padding(20)
             
             Menu {
-                Button("More"){print("MORE")}
+                Button("More") {
+                    if let url = conversation.recordingURL {
+                        print("Riproduzione")
+                        audioPlayer.startPlayback(audio: url)
+                    }
+                }
+                .disabled(conversation.recordingURL == nil)
+
                 Button("Delete", role: .destructive, action: deleteAction)
             } label: {
                 Label("", systemImage: "ellipsis.circle")

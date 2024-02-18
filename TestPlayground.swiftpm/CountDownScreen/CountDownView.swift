@@ -5,6 +5,8 @@ import Combine
 struct CountdownTimerView: View {
     @State private var timer: Publishers.Autoconnect<Timer.TimerPublisher>
     
+    @ObservedObject var audioRecorder = AudioRecorder()
+    
     @Binding var title: String
     @Binding var note: String
     @Binding var playerNames: [String]
@@ -75,6 +77,9 @@ struct CountdownTimerView: View {
                 }
             }
         }
+        .onAppear {
+                    audioRecorder.startRecording()
+                }
         .onReceive(timer) { _ in
             updateTimer()
         }
@@ -83,13 +88,19 @@ struct CountdownTimerView: View {
     
     private func saveAction() {
         print("NOTE: \(note)")
-        let conversation = Conversation(
-            title: self.title,
-            participantNames: self.playerNames,
-            totalDuration: self.timerDuration * Double(self.playerNames.count),
-            notes: self.note,
-            lastUpdated: Date()
-        )
+        audioRecorder.stopRecording()
+
+                    // Crea l'istanza di Conversation con tutti i dettagli, inclusa la registrazione
+        let recordingURL = audioRecorder.recordings.last
+
+                    let conversation = Conversation(
+                        title: self.title,
+                        participantNames: self.playerNames,
+                        totalDuration: self.timerDuration * Double(self.playerNames.count),
+                        notes: self.note,
+                        lastUpdated: Date(),
+                        recordingURL: recordingURL // Aggiunta del percorso della registrazione
+                    )
         
         saveConversation(conversation)
         showContentView = true
