@@ -35,7 +35,7 @@ struct ContentView: View {
         NavigationLink {
             SettingsView()
         } label: {
-            Image(systemName: "calendar")
+            Image(systemName: "gear")
                 .font(.system(size: isLargeScreen ? 60 : 40))
                 .padding(.leading)
                 .frame(height: 40)
