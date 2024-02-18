@@ -55,6 +55,7 @@ struct ConversationCard: View {
             .padding(20)
             
             Menu {
+                Button("More"){print("MORE")}
                 Button("Delete", role: .destructive, action: deleteAction)
             } label: {
                 Label("", systemImage: "ellipsis.circle")
