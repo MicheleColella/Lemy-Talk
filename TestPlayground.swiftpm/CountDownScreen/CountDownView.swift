@@ -91,8 +91,7 @@ struct CountdownTimerView: View {
         audioRecorder.stopRecording()
 
                     // Crea l'istanza di Conversation con tutti i dettagli, inclusa la registrazione
-        let recordingURL = audioRecorder.recordings.last
-
+                    let recordingURL = audioRecorder.recordings.last
                     let conversation = Conversation(
                         title: self.title,
                         participantNames: self.playerNames,
